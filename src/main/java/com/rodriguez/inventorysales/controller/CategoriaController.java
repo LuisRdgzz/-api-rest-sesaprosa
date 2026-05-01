@@ -5,20 +5,22 @@ import com.rodriguez.inventorysales.dto.response.CategoriaResponse;
 import com.rodriguez.inventorysales.service.CategoriaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Categorias")
+@Tag(name = "Categorías")
 @RestController
 @RequestMapping("/api/categorias")
-@RequiredArgsConstructor
 public class CategoriaController {
 
     private final CategoriaService service;
+
+    public CategoriaController(CategoriaService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<CategoriaResponse> listar() { return service.listar(); }

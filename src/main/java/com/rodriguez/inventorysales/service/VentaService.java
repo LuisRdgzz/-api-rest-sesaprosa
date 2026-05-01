@@ -12,8 +12,8 @@ import com.rodriguez.inventorysales.exception.ResourceNotFoundException;
 import com.rodriguez.inventorysales.mapper.VentaMapper;
 import com.rodriguez.inventorysales.repository.ProductoRepository;
 import com.rodriguez.inventorysales.repository.VentaRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -22,18 +22,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class VentaService {
+
+    private static final Logger log = LoggerFactory.getLogger(VentaService.class);
 
     private final ProductoRepository productoRepository;
     private final VentaRepository ventaRepository;
     private final VentaMapper ventaMapper;
 
+    public VentaService(ProductoRepository productoRepository,
+                        VentaRepository ventaRepository,
+                        VentaMapper ventaMapper) {
+        this.productoRepository = productoRepository;
+        this.ventaRepository = ventaRepository;
+        this.ventaMapper = ventaMapper;
+    }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public VentaResponse registrarVenta(VentaRequest request) {
-        log.info("Se esta iniciando el registro de venta con {} ítems", request.getDetalles().size());
+        log.info("Iniciando registro de venta con {} ítems", request.getDetalles().size());
 
         try {
             Venta venta = Venta.builder()
@@ -46,8 +54,7 @@ public class VentaService {
             for (DetalleVentaRequest item : request.getDetalles()) {
                 Producto producto = productoRepository.findById(item.getProductoId())
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "No ha sido encontrado el producto con id =" + item.getProductoId()));
-
+                                "Producto no encontrado id=" + item.getProductoId()));
 
                 if (producto.getStockActual() < item.getCantidad()) {
                     throw new InsufficientStockException(String.format(
@@ -57,10 +64,8 @@ public class VentaService {
                             item.getCantidad()));
                 }
 
-
                 producto.setStockActual(producto.getStockActual() - item.getCantidad());
                 productoRepository.save(producto);
-
 
                 BigDecimal subtotal = producto.getPrecio()
                         .multiply(BigDecimal.valueOf(item.getCantidad()));
@@ -81,15 +86,15 @@ public class VentaService {
             venta.setTotal(total);
             Venta guardada = ventaRepository.save(venta);
 
-            log.info("Venta id={} fue registrada exitosamente. Total: {}",
+            log.info("Venta id={} registrada exitosamente. Total: {}",
                     guardada.getId(), guardada.getTotal());
 
             return ventaMapper.toResponse(guardada);
 
         } catch (OptimisticLockingFailureException ex) {
-            log.warn("Se ha detectado un conflicto de concurrencia detectado durante venta", ex);
+            log.warn("Conflicto de concurrencia detectado durante venta", ex);
             throw new ConcurrencyConflictException(
-                    "otro usuario modifico un producto al mismo tiempo. Reintenta la venta.");
+                    "Otro usuario modificó un producto al mismo tiempo. Reintenta la venta.");
         }
     }
 
@@ -97,7 +102,7 @@ public class VentaService {
     public VentaResponse obtener(Long id) {
         Venta v = ventaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No ha sido encontrada la venta con id=" + id));
+                        "Venta no encontrada id=" + id));
         return ventaMapper.toResponse(v);
     }
 }

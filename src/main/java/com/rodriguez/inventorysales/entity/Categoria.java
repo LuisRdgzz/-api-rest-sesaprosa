@@ -1,8 +1,6 @@
 package com.rodriguez.inventorysales.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,9 +8,6 @@ import java.util.Set;
 @Table(name = "categorias", indexes = {
         @Index(name = "idx_categoria_nombre", columnList = "nombre")
 })
-
-
-@Builder
 public class Categoria {
 
     @Id
@@ -26,11 +21,10 @@ public class Categoria {
     private String descripcion;
 
     @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
-    @Builder.Default
     private Set<Producto> productos = new HashSet<>();
 
-    public Categoria() {
-    }
+
+    public Categoria() {}
 
     public Categoria(Long id, String nombre, String descripcion, Set<Producto> productos) {
         this.id = id;
@@ -39,37 +33,34 @@ public class Categoria {
         this.productos = productos;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public static Builder builder() { return new Builder(); }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public static class Builder {
+        private Long id;
+        private String nombre;
+        private String descripcion;
+        private Set<Producto> productos = new HashSet<>();
 
-    public String getNombre() {
-        return nombre;
-    }
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder nombre(String nombre) { this.nombre = nombre; return this; }
+        public Builder descripcion(String descripcion) { this.descripcion = descripcion; return this; }
+        public Builder productos(Set<Producto> productos) { this.productos = productos; return this; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Set<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(Set<Producto> productos) {
-        this.productos = productos;
+        public Categoria build() {
+            return new Categoria(id, nombre, descripcion, productos);
+        }
     }
 
 
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public Set<Producto> getProductos() { return productos; }
+    public void setProductos(Set<Producto> productos) { this.productos = productos; }
 }

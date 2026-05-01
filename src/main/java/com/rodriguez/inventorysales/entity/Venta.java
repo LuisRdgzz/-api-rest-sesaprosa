@@ -1,7 +1,6 @@
 package com.rodriguez.inventorysales.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,8 +10,6 @@ import java.util.List;
 @Table(name = "ventas", indexes = {
         @Index(name = "idx_venta_fecha", columnList = "fecha_venta")
 })
-
-@Builder
 public class Venta {
 
     @Id
@@ -25,13 +22,11 @@ public class Venta {
     @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal total;
 
-
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
-    public Venta() {
-    }
+   public Venta() {}
 
     public Venta(Long id, LocalDateTime fechaVenta, BigDecimal total, List<DetalleVenta> detalles) {
         this.id = id;
@@ -40,41 +35,36 @@ public class Venta {
         this.detalles = detalles;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public static Builder builder() { return new Builder(); }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public static class Builder {
+        private Long id;
+        private LocalDateTime fechaVenta;
+        private BigDecimal total;
+        private List<DetalleVenta> detalles = new ArrayList<>();
 
-    public LocalDateTime getFechaVenta() {
-        return fechaVenta;
-    }
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder fechaVenta(LocalDateTime fechaVenta) { this.fechaVenta = fechaVenta; return this; }
+        public Builder total(BigDecimal total) { this.total = total; return this; }
+        public Builder detalles(List<DetalleVenta> detalles) { this.detalles = detalles; return this; }
 
-    public void setFechaVenta(LocalDateTime fechaVenta) {
-        this.fechaVenta = fechaVenta;
+        public Venta build() { return new Venta(id, fechaVenta, total, detalles); }
     }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
-
 
     public void agregarDetalle(DetalleVenta detalle) {
         detalles.add(detalle);
         detalle.setVenta(this);
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public LocalDateTime getFechaVenta() { return fechaVenta; }
+    public void setFechaVenta(LocalDateTime fechaVenta) { this.fechaVenta = fechaVenta; }
+
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
+
+    public List<DetalleVenta> getDetalles() { return detalles; }
+    public void setDetalles(List<DetalleVenta> detalles) { this.detalles = detalles; }
 }

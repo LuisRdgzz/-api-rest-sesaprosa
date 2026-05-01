@@ -1,6 +1,7 @@
 package com.rodriguez.inventorysales.exception;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,32 +15,33 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
-        log.warn("Lo sentimos , el recursos no ha sido encontrado: {}", ex.getMessage());
+        log.warn("Recurso no encontrado: {}", ex.getMessage());
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<Map<String, Object>> handleStock(InsufficientStockException ex) {
-        log.warn("eL stock es insuficiente: {}", ex.getMessage());
+        log.warn("Stock insuficiente: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler({OptimisticLockingFailureException.class, ConcurrencyConflictException.class})
     public ResponseEntity<Map<String, Object>> handleConcurrency(Exception ex) {
-        log.warn("Actaulemtne estamos teniendo un conflicto de concurrencia: {}", ex.getMessage());
+        log.warn("Conflicto de concurrencia: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT,
-                "El recurso fue modificado por otra transacción. Reintenta la operación mas tarde");
+                "El recurso fue modificado por otra transacción. Reintenta la operación.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = baseBody(HttpStatus.BAD_REQUEST, "Datos de entrada invalidos");
+        Map<String, Object> body = baseBody(HttpStatus.BAD_REQUEST, "Datos de entrada inválidos");
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
@@ -49,7 +51,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuth(AuthenticationException ex) {
-        return build(HttpStatus.UNAUTHORIZED, "Credenciales invalidas");
+        return build(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
     }
 
     @ExceptionHandler(AccessDeniedException.class)

@@ -1,7 +1,6 @@
 package com.rodriguez.inventorysales.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -9,8 +8,6 @@ import java.math.BigDecimal;
         @Index(name = "idx_detalle_venta", columnList = "venta_id"),
         @Index(name = "idx_detalle_producto", columnList = "producto_id")
 })
-
-@Builder
 public class DetalleVenta {
 
     @Id
@@ -33,54 +30,49 @@ public class DetalleVenta {
     @Column(name = "precio_unitario", nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitario;
 
-    public DetalleVenta() {
-    }
+    public DetalleVenta() {}
 
-    public DetalleVenta(BigDecimal precioUnitario, Integer cantidad, Producto producto, Venta venta, Long id) {
-        this.precioUnitario = precioUnitario;
-        this.cantidad = cantidad;
-        this.producto = producto;
-        this.venta = venta;
+    public DetalleVenta(Long id, Venta venta, Producto producto,
+                        Integer cantidad, BigDecimal precioUnitario) {
         this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Venta getVenta() {
-        return venta;
-    }
-
-    public void setVenta(Venta venta) {
         this.venta = venta;
-    }
-
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
         this.producto = producto;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
-    }
-
-    public BigDecimal getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
     }
+
+    public static Builder builder() { return new Builder(); }
+
+    public static class Builder {
+        private Long id;
+        private Venta venta;
+        private Producto producto;
+        private Integer cantidad;
+        private BigDecimal precioUnitario;
+
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder venta(Venta venta) { this.venta = venta; return this; }
+        public Builder producto(Producto producto) { this.producto = producto; return this; }
+        public Builder cantidad(Integer cantidad) { this.cantidad = cantidad; return this; }
+        public Builder precioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; return this; }
+
+        public DetalleVenta build() {
+            return new DetalleVenta(id, venta, producto, cantidad, precioUnitario);
+        }
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Venta getVenta() { return venta; }
+    public void setVenta(Venta venta) { this.venta = venta; }
+
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
+
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+
+    public BigDecimal getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
 }

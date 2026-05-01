@@ -1,8 +1,6 @@
 package com.rodriguez.inventorysales.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -11,8 +9,6 @@ import java.math.BigDecimal;
         @Index(name = "idx_producto_nombre", columnList = "nombre"),
         @Index(name = "idx_producto_categoria", columnList = "categoria_id")
 })
-
-@Builder
 public class Producto {
 
     @Id
@@ -31,7 +27,6 @@ public class Producto {
     @Column(name = "stock_actual", nullable = false)
     private Integer stockActual;
 
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "categoria_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_producto_categoria"))
@@ -41,10 +36,10 @@ public class Producto {
     @Column(nullable = false)
     private Long version;
 
-    public Producto() {
-    }
+    public Producto() {}
 
-    public Producto(Long id, String sku, String nombre, BigDecimal precio, Integer stockActual, Categoria categoria, Long version) {
+    public Producto(Long id, String sku, String nombre, BigDecimal precio,
+                    Integer stockActual, Categoria categoria, Long version) {
         this.id = id;
         this.sku = sku;
         this.nombre = nombre;
@@ -54,59 +49,48 @@ public class Producto {
         this.version = version;
     }
 
-    public Long getId() {
-        return id;
+    public static Builder builder() { return new Builder(); }
+
+    public static class Builder {
+        private Long id;
+        private String sku;
+        private String nombre;
+        private BigDecimal precio;
+        private Integer stockActual;
+        private Categoria categoria;
+        private Long version;
+
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder sku(String sku) { this.sku = sku; return this; }
+        public Builder nombre(String nombre) { this.nombre = nombre; return this; }
+        public Builder precio(BigDecimal precio) { this.precio = precio; return this; }
+        public Builder stockActual(Integer stockActual) { this.stockActual = stockActual; return this; }
+        public Builder categoria(Categoria categoria) { this.categoria = categoria; return this; }
+        public Builder version(Long version) { this.version = version; return this; }
+
+        public Producto build() {
+            return new Producto(id, sku, nombre, precio, stockActual, categoria, version);
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getSku() {
-        return sku;
-    }
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getNombre() {
-        return nombre;
-    }
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    public Integer getStockActual() { return stockActual; }
+    public void setStockActual(Integer stockActual) { this.stockActual = stockActual; }
 
-    public BigDecimal getPrecio() {
-        return precio;
-    }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
-
-    public Integer getStockActual() {
-        return stockActual;
-    }
-
-    public void setStockActual(Integer stockActual) {
-        this.stockActual = stockActual;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 }

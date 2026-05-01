@@ -1,11 +1,10 @@
 package com.rodriguez.inventorysales.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 import java.math.BigDecimal;
 
-@Data
 public class ProductoRequest {
+
     @NotBlank @Size(max = 50)
     private String sku;
 
@@ -20,4 +19,21 @@ public class ProductoRequest {
 
     @NotNull
     private Long categoriaId;
+
+    public ProductoRequest() {}
+
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
+
+    public Integer getStockActual() { return stockActual; }
+    public void setStockActual(Integer stockActual) { this.stockActual = stockActual; }
+
+    public Long getCategoriaId() { return categoriaId; }
+    public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
 }

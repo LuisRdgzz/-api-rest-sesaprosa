@@ -9,8 +9,8 @@ import com.rodriguez.inventorysales.mapper.ProductoMapper;
 import com.rodriguez.inventorysales.repository.CategoriaRepository;
 import com.rodriguez.inventorysales.repository.ProductoRepository;
 import com.rodriguez.inventorysales.specification.ProductoSpecification;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,20 +19,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProductoService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductoService.class);
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ProductoMapper mapper;
 
+    public ProductoService(ProductoRepository productoRepository,
+                           CategoriaRepository categoriaRepository,
+                           ProductoMapper mapper) {
+        this.productoRepository = productoRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.mapper = mapper;
+    }
+
     @Transactional(readOnly = true)
     public Page<ProductoResponse> listar(String nombre, BigDecimal precioMin,
                                          BigDecimal precioMax, Long categoriaId,
                                          Pageable pageable) {
-
         Specification<Producto> spec = Specification
                 .where(ProductoSpecification.conNombre(nombre))
                 .and(ProductoSpecification.conPrecioMinimo(precioMin))
@@ -49,13 +56,13 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponse crear(ProductoRequest req) {
-        log.info("Se esta creando producto sku={}", req.getSku());
+        log.info("Creando producto sku={}", req.getSku());
         if (productoRepository.existsBySku(req.getSku()))
             throw new IllegalArgumentException("SKU ya existe: " + req.getSku());
 
         Categoria cat = categoriaRepository.findById(req.getCategoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No ha sido encontrada la caetgoria con id=" + req.getCategoriaId()));
+                        "Categoría no encontrada id=" + req.getCategoriaId()));
 
         Producto p = Producto.builder()
                 .sku(req.getSku())
@@ -73,7 +80,7 @@ public class ProductoService {
         Producto p = buscar(id);
         Categoria cat = categoriaRepository.findById(req.getCategoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No ha sido encontrada la caetgoria con id=" + req.getCategoriaId()));
+                        "Categoría no encontrada id=" + req.getCategoriaId()));
 
         p.setSku(req.getSku());
         p.setNombre(req.getNombre());
@@ -92,6 +99,6 @@ public class ProductoService {
     private Producto buscar(Long id) {
         return productoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No ha sido encontrado el producto con id =" + id));
+                        "Producto no encontrado id=" + id));
     }
 }

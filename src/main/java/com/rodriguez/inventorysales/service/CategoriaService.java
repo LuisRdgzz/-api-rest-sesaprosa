@@ -6,20 +6,25 @@ import com.rodriguez.inventorysales.entity.Categoria;
 import com.rodriguez.inventorysales.exception.ResourceNotFoundException;
 import com.rodriguez.inventorysales.mapper.CategoriaMapper;
 import com.rodriguez.inventorysales.repository.CategoriaRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class CategoriaService {
+
+    private static final Logger log = LoggerFactory.getLogger(CategoriaService.class);
 
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper mapper;
+
+    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper mapper) {
+        this.categoriaRepository = categoriaRepository;
+        this.mapper = mapper;
+    }
 
     @Transactional(readOnly = true)
     public List<CategoriaResponse> listar() {
@@ -33,7 +38,7 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponse crear(CategoriaRequest req) {
-        log.info("La categoria se esta creando: {}", req.getNombre());
+        log.info("Creando categoría: {}", req.getNombre());
         Categoria c = Categoria.builder()
                 .nombre(req.getNombre())
                 .descripcion(req.getDescripcion())
@@ -51,7 +56,7 @@ public class CategoriaService {
 
     @Transactional
     public void eliminar(Long id) {
-        log.info("Se esta eliminado la categoria con  id={}", id);
+        log.info("Eliminando categoría id={}", id);
         Categoria c = buscar(id);
         categoriaRepository.delete(c);
     }
@@ -59,6 +64,6 @@ public class CategoriaService {
     private Categoria buscar(Long id) {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No ha sido encontrada la caetgoria con id=" + id));
+                        "Categoría no encontrada con id=" + id));
     }
 }

@@ -5,7 +5,6 @@ import com.rodriguez.inventorysales.dto.response.ProductoResponse;
 import com.rodriguez.inventorysales.service.ProductoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,10 +16,13 @@ import java.math.BigDecimal;
 @Tag(name = "Productos")
 @RestController
 @RequestMapping("/api/productos")
-@RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService service;
+
+    public ProductoController(ProductoService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public Page<ProductoResponse> listar(
