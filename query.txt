@@ -1,0 +1,90 @@
+
+
+ Crear la base de datos si no existe
+CREATE DATABASE IF NOT EXISTS inventory_sales
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE inventory_sales;
+
+CREATE TABLE IF NOT EXISTS categorias (
+    id           BIGINT          NOT NULL AUTO_INCREMENT,
+    nombre       VARCHAR(100)    NOT NULL,
+    descripcion  VARCHAR(500)    NULL,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_categoria_nombre (nombre),
+    INDEX idx_categoria_nombre (nombre)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS productos (
+    id            BIGINT          NOT NULL AUTO_INCREMENT,
+    sku           VARCHAR(50)     NOT NULL,
+    nombre        VARCHAR(200)    NOT NULL,
+    precio        DECIMAL(12,2)   NOT NULL,
+    stock_actual  INT             NOT NULL DEFAULT 0,
+    categoria_id  BIGINT          NOT NULL,
+    version       BIGINT          NOT NULL DEFAULT 0,  -- Optimistic Locking
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_producto_sku (sku),
+    INDEX idx_producto_nombre (nombre),
+    INDEX idx_producto_categoria (categoria_id),
+
+    CONSTRAINT fk_producto_categoria
+        FOREIGN KEY (categoria_id)
+        REFERENCES categorias(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+    CONSTRAINT chk_precio_positivo  CHECK (precio > 0),
+    CONSTRAINT chk_stock_no_negativo CHECK (stock_actual >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ventas (
+    id           BIGINT          NOT NULL AUTO_INCREMENT,
+    fecha_venta  DATETIME        NOT NULL,
+    total        DECIMAL(14,2)   NOT NULL,
+
+    PRIMARY KEY (id),
+    INDEX idx_venta_fecha (fecha_venta),
+
+    CONSTRAINT chk_total_positivo CHECK (total >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS detalle_ventas (
+    id              BIGINT          NOT NULL AUTO_INCREMENT,
+    venta_id        BIGINT          NOT NULL,
+    producto_id     BIGINT          NOT NULL,
+    cantidad        INT             NOT NULL,
+    precio_unitario DECIMAL(12,2)   NOT NULL,
+
+    PRIMARY KEY (id),
+    INDEX idx_detalle_venta (venta_id),
+    INDEX idx_detalle_producto (producto_id),
+
+    CONSTRAINT fk_detalle_venta
+        FOREIGN KEY (venta_id)
+        REFERENCES ventas(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_detalle_producto
+        FOREIGN KEY (producto_id)
+        REFERENCES productos(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+    CONSTRAINT chk_cantidad_positiva CHECK (cantidad > 0),
+    CONSTRAINT chk_precio_unit_positivo CHECK (precio_unitario > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id        BIGINT       NOT NULL AUTO_INCREMENT,
+    username  VARCHAR(50)  NOT NULL,
+    password  VARCHAR(255) NOT NULL,    -- Hash BCrypt
+    role      VARCHAR(20)  NOT NULL,    -- ROLE_ADMIN, ROLE_USER
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_usuario_username (username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
