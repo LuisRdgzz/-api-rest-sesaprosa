@@ -48,7 +48,7 @@ public class VentaService {
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "No ha sido encontrado el producto con id =" + item.getProductoId()));
 
-                // 1. VALIDAR STOCK
+
                 if (producto.getStockActual() < item.getCantidad()) {
                     throw new InsufficientStockException(String.format(
                             "Stock insuficiente para producto '%s' (disponible: %d, solicitado: %d)",
@@ -57,11 +57,11 @@ public class VentaService {
                             item.getCantidad()));
                 }
 
-                // 2. DESCONTAR STOCK (Hibernate verificará @Version al hacer UPDATE)
+
                 producto.setStockActual(producto.getStockActual() - item.getCantidad());
                 productoRepository.save(producto);
 
-                // 3. CREAR DETALLE
+
                 BigDecimal subtotal = producto.getPrecio()
                         .multiply(BigDecimal.valueOf(item.getCantidad()));
                 total = total.add(subtotal);

@@ -32,7 +32,7 @@ public class ProductoService {
     public Page<ProductoResponse> listar(String nombre, BigDecimal precioMin,
                                          BigDecimal precioMax, Long categoriaId,
                                          Pageable pageable) {
-        // Combinamos filtros con Specification.where(...).and(...)
+
         Specification<Producto> spec = Specification
                 .where(ProductoSpecification.conNombre(nombre))
                 .and(ProductoSpecification.conPrecioMinimo(precioMin))
