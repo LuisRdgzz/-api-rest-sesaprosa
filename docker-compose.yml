@@ -6,7 +6,7 @@ services:
     container_name: inventory_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: MySecurePass123!
+      MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE: inventory_sales
     ports:
       - "3307:3306"
@@ -31,7 +31,7 @@ services:
       DB_PORT: 3306
       DB_NAME: inventory_sales
       DB_USER: root
-      DB_PASSWORD: MySecurePass123!
+      DB_PASSWORD:
       JWT_SECRET: bXktc3VwZXItc2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC1zaWduaW5nLWNoYW5nZS1pbi1wcm9k
     ports:
       - "8080:8080"
